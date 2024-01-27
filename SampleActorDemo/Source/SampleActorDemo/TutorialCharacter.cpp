@@ -11,6 +11,14 @@ ATutorialCharacter::ATutorialCharacter()
 
 }
 
+void ATutorialCharacter::SpawnActor()
+{
+	FActorSpawnParameters spawnParameters;
+	spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	
+	GetWorld()->SpawnActor<AActor>(actorBPToSpawn, GetActorTransform(), spawnParameters);
+}
+
 // Called when the game starts or when spawned
 void ATutorialCharacter::BeginPlay()
 {
