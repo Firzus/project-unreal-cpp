@@ -5,25 +5,31 @@
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "GameFramework/SpringArmComponent.h"
 
+// Sets default values
 // Sets default values
 ASamplePawn::ASamplePawn()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this pawn to call Tick() every frame.
 	PrimaryActorTick.bCanEverTick = true;
 
+	AutoPossessPlayer = EAutoReceiveInput::Player0;
+	
 	// Initialize StaticMeshComponent
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	RootComponent = StaticMesh;
 
+	// Initialize SpringArmComponent first
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	SpringArm->SetupAttachment(RootComponent);
+
+	// Initialize CameraComponent and attach it to the SpringArm
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
+	CameraComponent->SetupAttachment(SpringArm);
+
 	// Initialize FloatingPawnMovement
 	FloatingMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("FloatingMovement"));
-
-	// Initialize CameraComponent
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	CameraComponent->SetupAttachment(StaticMesh);
-	CameraComponent->SetRelativeLocation(FVector(-300.0f, 0.0f, 300.0f));
-	CameraComponent->SetRelativeRotation(FRotator(-45.0f, 0.0f, 0.0f));
 }
 
 // Called when the game starts or when spawned
@@ -49,6 +55,16 @@ void ASamplePawn::MoveRight(float Value)
 	}
 }
 
+void ASamplePawn::Turn(float Value)
+{
+	AddControllerYawInput(Value);
+}
+
+void ASamplePawn::LookUp(float Value)
+{
+	AddControllerPitchInput(Value);
+}
+
 // Called every frame
 void ASamplePawn::Tick(float DeltaTime)
 {
@@ -63,5 +79,8 @@ void ASamplePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASamplePawn::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ASamplePawn::MoveRight);
+	
+	PlayerInputComponent->BindAxis("Turn", this, &ASamplePawn::Turn);
+	PlayerInputComponent->BindAxis("LookUp", this, &ASamplePawn::LookUp);
 }
 

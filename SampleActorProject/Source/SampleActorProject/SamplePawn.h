@@ -23,9 +23,14 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* StaticMesh;
 
+	UPROPERTY(VisibleAnywhere)
+	class USpringArmComponent* SpringArm;
+
 	// Movement
 	void MoveForward(float Value);
 	void MoveRight(float Value);
+	void Turn(float Value);
+	void LookUp(float Value);
 
 	// FloatingPawnMovement
 	UPROPERTY(VisibleAnywhere)
@@ -41,5 +46,4 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 };
