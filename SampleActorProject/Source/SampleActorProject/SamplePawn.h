@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Bullet.h"
 #include "SamplePawn.generated.h"
 
 UCLASS()
@@ -14,6 +15,9 @@ class SAMPLEACTORPROJECT_API ASamplePawn : public APawn
 public:
 	// Sets default values for this pawn's properties
 	ASamplePawn();
+
+	UPROPERTY(EditDefaultsOnly, Category = "Shooting")
+	TSubclassOf<ABullet> BulletClass;
 
 protected:
 	// Called when the game starts or when spawned
@@ -31,6 +35,8 @@ protected:
 	void MoveRight(float Value);
 	void Turn(float Value);
 	void LookUp(float Value);
+	
+	void Fire();
 
 	// FloatingPawnMovement
 	UPROPERTY(VisibleAnywhere)

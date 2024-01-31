@@ -15,7 +15,7 @@ ASamplePawn::ASamplePawn()
 	PrimaryActorTick.bCanEverTick = true;
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
-	
+
 	// Initialize StaticMeshComponent
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	RootComponent = StaticMesh;
@@ -36,7 +36,6 @@ ASamplePawn::ASamplePawn()
 void ASamplePawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ASamplePawn::MoveForward(float Value)
@@ -69,7 +68,6 @@ void ASamplePawn::LookUp(float Value)
 void ASamplePawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -79,8 +77,26 @@ void ASamplePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASamplePawn::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ASamplePawn::MoveRight);
-	
+
 	PlayerInputComponent->BindAxis("Turn", this, &ASamplePawn::Turn);
 	PlayerInputComponent->BindAxis("LookUp", this, &ASamplePawn::LookUp);
+
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASamplePawn::Fire);
 }
 
+void ASamplePawn::Fire()
+{
+	if (BulletClass != nullptr)
+	{
+		FVector SpawnLocation = GetActorLocation() + (GetActorForwardVector() * 20);
+		FRotator SpawnRotation = GetActorRotation();
+		
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = GetInstigator();
+		
+		FTransform SpawnTransform(SpawnRotation, SpawnLocation);
+		
+		ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(BulletClass, SpawnTransform, SpawnParams);
+	}
+}
