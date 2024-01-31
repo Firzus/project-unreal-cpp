@@ -12,6 +12,10 @@ ATarget::ATarget()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	MovementAmplitude = 1.f;
+	MovementFrequency = 1.f;
+	RunningTime = 0.f;
+	MovementDirection = FVector(1, 0, 0);
 	
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	RootComponent = StaticMesh;
@@ -24,13 +28,16 @@ ATarget::ATarget()
 void ATarget::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	MovementDirection = FMath::VRand();
 }
 
 // Called every frame
 void ATarget::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	MoveTarget(DeltaTime);
 }
 
 void ATarget::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -45,4 +52,13 @@ void ATarget::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitive
 
 		Destroy();
 	}
+}
+
+void ATarget::MoveTarget(float DeltaTime)
+{
+	RunningTime += DeltaTime;
+	float MovementOffset = FMath::Sin(RunningTime * MovementFrequency) * MovementAmplitude;
+	
+	FVector NewLocation = GetActorLocation() + (MovementDirection * MovementOffset);
+	SetActorLocation(NewLocation);
 }
