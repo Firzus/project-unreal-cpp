@@ -27,6 +27,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* PlayerCamera;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement")
+	float ForwardSpeed;
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

@@ -22,6 +22,5 @@ protected:
 	virtual void SetupInputComponent() override;
 
 private:
-	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
 };

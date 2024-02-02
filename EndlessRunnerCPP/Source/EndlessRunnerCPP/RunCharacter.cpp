@@ -21,6 +21,8 @@ ARunCharacter::ARunCharacter()
 	// Initialiser la caméra et l'attacher au Spring Arm
 	PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
 	PlayerCamera->SetupAttachment(CameraSpringArm, USpringArmComponent::SocketName);
+
+	ForwardSpeed = 1000.0f;
 }
 
 // Called when the game starts or when spawned
@@ -34,6 +36,9 @@ void ARunCharacter::BeginPlay()
 void ARunCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	FVector Direction = GetActorForwardVector();
+	AddMovementInput(Direction, ForwardSpeed * DeltaTime);
 }
 
 // Called to bind functionality to input
