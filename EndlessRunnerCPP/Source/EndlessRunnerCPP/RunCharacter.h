@@ -8,6 +8,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "RunCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterDeath);
+
 UCLASS()
 class ENDLESSRUNNERCPP_API ARunCharacter : public ACharacter
 {
@@ -17,6 +19,10 @@ public:
 	// Sets default values for this character's properties
 	ARunCharacter();
 
+	// Événement pour la mort du personnage
+	UPROPERTY(BlueprintAssignable, Category = "Event")
+	FOnCharacterDeath OnCharacterDeath;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -30,10 +36,22 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement")
 	float ForwardSpeed;
 
+	UPROPERTY(EditAnywhere, Category="Effects")
+	UParticleSystem* ExplosionEffect;
+
+	UPROPERTY(EditAnywhere, Category="Sound")
+	USoundBase* ExplosionSound;
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	UFUNCTION(BlueprintCallable, Category="Character")
+	void Die();
+
+private:
+	bool bIsDead;
 };

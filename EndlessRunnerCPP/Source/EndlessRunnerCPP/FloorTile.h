@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 // Components
-#include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
+
 #include "FloorTile.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTileExitedSignature, AFloorTile*, Tile);
@@ -28,9 +28,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	// Fonction appelée pour détruire la tuile
 	UFUNCTION()
 	void DestroyTile();
+
+	UFUNCTION()
+	void SpawnObstacle();
 
 public:
 	// Called every frame
@@ -56,6 +58,12 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category="Tile")
 	FOnTileExitedSignature OnTileExited;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	UBoxComponent* SpawnZone;
+	
+	UPROPERTY(EditAnywhere, Category="Spawning")
+	TArray<TSubclassOf<AActor>> ObstacleClasses;
 	
 	FTransform GetAttachTransform() const;
 

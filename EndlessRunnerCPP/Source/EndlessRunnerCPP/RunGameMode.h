@@ -13,4 +13,18 @@ UCLASS()
 class ENDLESSRUNNERCPP_API ARunGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
+
+public:
+	ARunGameMode();
+
+protected:
+	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void HandlePlayerDeath();
+	
+	void RestartLevel();
+	
+private:
+	
 };

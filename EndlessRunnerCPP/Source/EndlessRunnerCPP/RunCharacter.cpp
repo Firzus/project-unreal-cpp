@@ -3,6 +3,10 @@
 
 #include "RunCharacter.h"
 
+#include "RunCharacterController.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+
 
 // Sets default values
 ARunCharacter::ARunCharacter()
@@ -13,23 +17,23 @@ ARunCharacter::ARunCharacter()
 	// Initialiser le Spring Arm
 	CameraSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraSpringArm"));
 	CameraSpringArm->SetupAttachment(RootComponent);
-	CameraSpringArm->TargetArmLength = 300.0f; // La longueur du Spring Arm
-	CameraSpringArm->bUsePawnControlRotation = true; // La caméra suit la rotation du joueur
-	CameraSpringArm->bDoCollisionTest = false; // Désactiver le test de collision
-	CameraSpringArm->SocketOffset = FVector(0.0f, 0.0f, 100.0f); // Décaler légèrement en hauteur
+	CameraSpringArm->TargetArmLength = 300.0f;
+	CameraSpringArm->bUsePawnControlRotation = true;
+	CameraSpringArm->bDoCollisionTest = false; 
+	CameraSpringArm->SocketOffset = FVector(0.0f, 0.0f, 100.0f); 
 
 	// Initialiser la caméra et l'attacher au Spring Arm
 	PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
 	PlayerCamera->SetupAttachment(CameraSpringArm, USpringArmComponent::SocketName);
 
-	ForwardSpeed = 1000.0f;
+	ForwardSpeed = 100.0f;
+	bIsDead = false;
 }
 
 // Called when the game starts or when spawned
 void ARunCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -45,5 +49,32 @@ void ARunCharacter::Tick(float DeltaTime)
 void ARunCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+void ARunCharacter::Die()
+{
+	if (!bIsDead)
+	{
+		bIsDead = true;
+
+		OnCharacterDeath.Broadcast();
+
+        ARunCharacterController* RunCharacterController = Cast<ARunCharacterController>(GetController());
+        if (RunCharacterController)
+        {
+            RunCharacterController->DisableInput(RunCharacterController);
+        }
+
+		ForwardSpeed = 0.0f;
+
+		// Jouer l'effet de particules
+		UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionEffect, GetActorLocation());
+
+		// Jouer l'effet de son
+		UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation());
+		
+		// Cacher le mesh du personnage
+		GetMesh()->SetVisibility(false);
+	}
 }
 

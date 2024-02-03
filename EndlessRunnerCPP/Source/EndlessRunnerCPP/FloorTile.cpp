@@ -3,6 +3,8 @@
 
 #include "FloorTile.h"
 
+#include "Kismet/KismetMathLibrary.h"
+
 
 // Sets default values
 AFloorTile::AFloorTile()
@@ -40,6 +42,11 @@ AFloorTile::AFloorTile()
 
 	ExitTrigger->OnComponentBeginOverlap.AddDynamic(this, &AFloorTile::OnExitTriggerOverlap);
 	ExitTrigger->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
+
+	SpawnZone = CreateDefaultSubobject<UBoxComponent>(TEXT("SpawnZone"));
+	SpawnZone->SetupAttachment(RootScene);
+	SpawnZone->SetRelativeLocation(FVector(800, 0, 0));
+	SpawnZone->SetBoxExtent(FVector(1, 300, 1));
 }
 
 void AFloorTile::ScheduleDestruction()
@@ -52,7 +59,8 @@ void AFloorTile::ScheduleDestruction()
 void AFloorTile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	SpawnObstacle();
 }
 
 void AFloorTile::DestroyTile()
@@ -78,4 +86,25 @@ void AFloorTile::OnExitTriggerOverlap(UPrimitiveComponent* OverlappedComponent, 
 FTransform AFloorTile::GetAttachTransform() const
 {
 	return DirectionIndicator->GetComponentTransform();
+}
+
+void AFloorTile::SpawnObstacle() // ou ATileSpawner::SpawnObstacle
+{
+	if (ObstacleClasses.Num() > 0)
+	{
+		// Choisir aléatoirement une classe d'obstacle
+		TSubclassOf<AActor> SelectedObstacleClass = ObstacleClasses[FMath::RandRange(0, ObstacleClasses.Num() - 1)];
+
+		FVector BoxExtent = SpawnZone->GetScaledBoxExtent();
+		FVector Origin = SpawnZone->GetComponentLocation();
+		FVector SpawnPoint = UKismetMathLibrary::RandomPointInBoundingBox(Origin, BoxExtent);
+
+		FTransform SpawnTransform(FRotator::ZeroRotator, SpawnPoint);
+		AActor* SpawnedObstacle = GetWorld()->SpawnActor<AActor>(SelectedObstacleClass, SpawnTransform);
+
+		if (SpawnedObstacle != nullptr)
+		{
+			SpawnedObstacle->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+		}
+	}
 }
