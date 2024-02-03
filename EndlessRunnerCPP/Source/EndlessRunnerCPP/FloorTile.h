@@ -34,6 +34,12 @@ protected:
 	UFUNCTION()
 	void SpawnObstacle();
 
+	UFUNCTION()
+	void SpawnItem();
+
+	UFUNCTION()
+	void Spawn();
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -60,15 +66,31 @@ public:
 	FOnTileExitedSignature OnTileExited;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
-	UBoxComponent* SpawnZone;
+	UBoxComponent* SpawnZoneObstacle;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	UBoxComponent* SpawnZoneItem;
 	
 	UPROPERTY(EditAnywhere, Category="Spawning")
 	TArray<TSubclassOf<AActor>> ObstacleClasses;
+
+	UPROPERTY(EditAnywhere, Category="Spawning")
+	TArray<TSubclassOf<AActor>> ItemClasses;
+
+	// Chance de spawn pour les obstacles et les pickups
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
+	float ObstacleSpawnChance = 60.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
+	float PickupSpawnChance = 30.0f;
+
+	// Nombre maximum de pickups à générer
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
+	int32 MaxPickupCount = 3;
 	
 	FTransform GetAttachTransform() const;
 
 private:
 	UFUNCTION()
 	void OnExitTriggerOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
 };

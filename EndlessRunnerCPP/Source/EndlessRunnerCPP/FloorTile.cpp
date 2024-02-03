@@ -43,10 +43,15 @@ AFloorTile::AFloorTile()
 	ExitTrigger->OnComponentBeginOverlap.AddDynamic(this, &AFloorTile::OnExitTriggerOverlap);
 	ExitTrigger->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
 
-	SpawnZone = CreateDefaultSubobject<UBoxComponent>(TEXT("SpawnZone"));
-	SpawnZone->SetupAttachment(RootScene);
-	SpawnZone->SetRelativeLocation(FVector(800, 0, 0));
-	SpawnZone->SetBoxExtent(FVector(1, 300, 1));
+	SpawnZoneObstacle = CreateDefaultSubobject<UBoxComponent>(TEXT("SpawnZoneObstacle"));
+	SpawnZoneObstacle->SetupAttachment(RootScene);
+	SpawnZoneObstacle->SetRelativeLocation(FVector(800, 0, 0));
+	SpawnZoneObstacle->SetBoxExtent(FVector(1, 300, 1));
+
+	SpawnZoneItem = CreateDefaultSubobject<UBoxComponent>(TEXT("SpawnZoneItem"));
+	SpawnZoneItem->SetupAttachment(RootScene);
+	SpawnZoneItem->SetRelativeLocation(FVector(300, 0, 100));
+	SpawnZoneItem->SetBoxExtent(FVector(200, 400, 1));
 }
 
 void AFloorTile::ScheduleDestruction()
@@ -60,7 +65,7 @@ void AFloorTile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SpawnObstacle();
+	Spawn();
 }
 
 void AFloorTile::DestroyTile()
@@ -95,8 +100,8 @@ void AFloorTile::SpawnObstacle() // ou ATileSpawner::SpawnObstacle
 		// Choisir aléatoirement une classe d'obstacle
 		TSubclassOf<AActor> SelectedObstacleClass = ObstacleClasses[FMath::RandRange(0, ObstacleClasses.Num() - 1)];
 
-		FVector BoxExtent = SpawnZone->GetScaledBoxExtent();
-		FVector Origin = SpawnZone->GetComponentLocation();
+		FVector BoxExtent = SpawnZoneObstacle->GetScaledBoxExtent();
+		FVector Origin = SpawnZoneObstacle->GetComponentLocation();
 		FVector SpawnPoint = UKismetMathLibrary::RandomPointInBoundingBox(Origin, BoxExtent);
 
 		FTransform SpawnTransform(FRotator::ZeroRotator, SpawnPoint);
@@ -105,6 +110,45 @@ void AFloorTile::SpawnObstacle() // ou ATileSpawner::SpawnObstacle
 		if (SpawnedObstacle != nullptr)
 		{
 			SpawnedObstacle->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+		}
+	}
+}
+
+void AFloorTile::SpawnItem()
+{
+	if(ItemClasses.Num() > 0)
+	{
+		TSubclassOf<AActor> SelectedItemClass = ItemClasses[FMath::RandRange(0, ItemClasses.Num() - 1)];
+
+		FVector BoxExtent = SpawnZoneItem->GetScaledBoxExtent();
+		FVector Origin = SpawnZoneItem->GetComponentLocation();
+		FVector SpawnPoint = UKismetMathLibrary::RandomPointInBoundingBox(Origin, BoxExtent);
+
+		FTransform SpawnTransform(FRotator::ZeroRotator, SpawnPoint);
+		AActor* SpawnedItem = GetWorld()->SpawnActor<AActor>(SelectedItemClass, SpawnTransform);
+
+		if (SpawnedItem != nullptr)
+		{
+			SpawnedItem->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+		}
+	}
+}
+
+void AFloorTile::Spawn()
+{
+	// Décider de générer un obstacle
+	if (FMath::FRand() * 100.0f < ObstacleSpawnChance)
+	{
+		SpawnObstacle();
+	}
+
+	// Décider du nombre de pickups à générer
+	int32 PickupCount = FMath::RandRange(0, MaxPickupCount);
+	for (int32 i = 0; i < PickupCount; ++i)
+	{
+		if (FMath::FRand() * 100.0f < PickupSpawnChance)
+		{
+			SpawnItem();
 		}
 	}
 }

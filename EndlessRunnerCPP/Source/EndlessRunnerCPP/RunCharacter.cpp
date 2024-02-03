@@ -78,3 +78,7 @@ void ARunCharacter::Die()
 	}
 }
 
+void ARunCharacter::AddCoins(int32 NumberOfCoins)
+{
+	CoinsCollected += NumberOfCoins;
+}

@@ -26,8 +26,7 @@ void ATileSpawner::SpawnNextTile()
 		if (NewTile != nullptr)
 		{
 			LastAttachPoint = NewTile->GetAttachTransform().GetLocation();
-
-			// S'abonner à l'événement OnTileExited de la nouvelle tuile
+			
 			NewTile->OnTileExited.AddDynamic(this, &ATileSpawner::HandleTileExited);
 		}
 	}
@@ -35,11 +34,8 @@ void ATileSpawner::SpawnNextTile()
 
 void ATileSpawner::HandleTileExited(AFloorTile* Tile)
 {
-	// Générer la prochaine tuile lorsque l'événement est déclenché
 	SpawnNextTile();
 }
-
-
 
 // Called when the game starts or when spawned
 void ATileSpawner::BeginPlay()
