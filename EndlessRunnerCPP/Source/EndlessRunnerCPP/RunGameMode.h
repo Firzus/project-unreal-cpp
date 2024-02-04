@@ -24,7 +24,4 @@ protected:
 	void HandlePlayerDeath();
 	
 	void RestartLevel();
-	
-private:
-	
 };

@@ -42,9 +42,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Sound")
 	USoundBase* ExplosionSound;
 
-	UPROPERTY(VisibleAnywhere, Category = "Coins")
-	int32 CoinsCollected = 0;
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
+	bool bIsDead;
+	
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -56,7 +56,7 @@ public:
 	void Die();
 
 	void AddCoins(int32 NumberOfCoins);
-	
-private:
-	bool bIsDead;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Coins")
+	int32 CoinsCollected = 0;
 };

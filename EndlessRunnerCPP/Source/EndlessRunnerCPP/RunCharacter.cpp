@@ -4,7 +4,6 @@
 #include "RunCharacter.h"
 
 #include "RunCharacterController.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -72,9 +71,6 @@ void ARunCharacter::Die()
 
 		// Jouer l'effet de son
 		UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation());
-		
-		// Cacher le mesh du personnage
-		GetMesh()->SetVisibility(false);
 	}
 }
 
